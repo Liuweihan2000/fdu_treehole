@@ -1,0 +1,58 @@
+{{ define "content" }}
+
+
+
+  <p>创建于{{ .ThreadCreatedAt }}，共有{{ .PostCount }}条回复</p>
+  <div class="">
+
+  </div>
+
+
+  {{ range .Posts }}
+      <div class="row">
+          <div class="alert alert-info col-sm-4 col-sm-offset-4">
+              <p>
+                  {{ .CreatedAt }}
+              </p>
+              <p>
+                  {{ .UserName }}: {{ .Content }}
+              </p>
+          </div>
+      </div>
+  {{ end }}
+
+  {{ if eq .Followed true }}
+      <br>
+      <div class="row">
+          <button class="btn btn-info btn disabled" type="submit"><span class="glyphicon glyphicon-ok"> Followed</span></button>
+      </div><br>
+  {{ else }}
+      <form action="/threads/read" method="post" class="form-horizontal" role="form">
+          <div class="form-group">
+              <input type="hidden" id="thread_id" name="thread_id" value="{{ .ThreadID }}">
+          </div>
+
+          <div class="form-group">
+              <button class="btn btn-info" type="submit"><span class="glyphicon glyphicon-plus"> Follow</span></button>
+          </div>
+      </form>
+  {{ end }}
+
+  <form action="/posts/create" method="post" class="form-horizontal" role="form">
+      <div class="form-group">
+          <label for="content">回复内容:</label><br>
+          <div class="input-group col-sm-4 col-sm-offset-4">
+              <textarea rows="4" id="content" name="content" autofocus required class="form-control"></textarea><br>
+          </div>
+      </div>
+      <div class="form-group">
+          <button class="btn btn-default" type="submit">回复</button>
+          <button class="btn btn-default"><a href="/">返回</a></button>
+      </div>
+      <div class="form-group">
+          <input type="hidden", id="thread_id", name="thread_id" value="{{ .ThreadID }}">
+      </div>
+  </form>
+
+
+{{ end }}

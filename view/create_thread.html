@@ -1,0 +1,39 @@
+{{ define "content" }}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>登录</title>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+  <h2>创建主题</h2>
+
+  <form action="/threads/create" method="post" class="form-horizontal" role="form">
+
+    <div class="form-group">
+      <label for="content" class="col-sm-5 control-label">贴名:</label>
+      <div class="input-group col-sm-2">
+        <input type="text" class="form-control" id="content" name="content" required autofocus>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-offset-5 col-sm-2">
+        <button type="submit" class="btn btn-default">
+          确认提交
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+  <div class="col-sm-offset-5 col-sm-2">
+    <button class="btn">
+      <a href="/">返回</a>
+    </button>
+  </div>
+
+{{ end }}

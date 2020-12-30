@@ -1,0 +1,38 @@
+{{ define "layout" }}
+
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>BBS</title>
+
+  <style>
+    body {
+      text-align: center;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<h1>复旦树洞<small>Beta</small></h1>
+
+{{ template "content" . }}
+
+</body>
+
+</html>
+
+{{ end }}

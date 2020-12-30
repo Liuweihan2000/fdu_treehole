@@ -1,0 +1,57 @@
+{{ define "content" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar role=navigation navbar-static-top">
+    <div class="container-fluid">
+        <div>
+            <ul class="nav nav-justified">
+                <li class="navbar-header">
+                    <a href="/"><span class="glyphicon glyphicon-home"> Home</span></a>
+                </li>
+
+                <li>
+                    <form action="/threads/search" class="navbar-form" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="thread_id" name="thread_id" placeholder="请输入帖子ID">
+                        </div>
+                        <button type="submit" class="btn btn-link">
+                            <span class="glyphicon glyphicon-search">搜索</span>
+                        </button>
+                    </form>
+                </li>
+
+                <li><a href="/threads/create"><span class="glyphicon glyphicon-pencil">创建帖子</span></a></li>
+                <li><a href="/threads/read_follow"><span class="glyphicon glyphicon-star">我的收藏</span></a></li>
+                <li><a href="/reset"><span class="glyphicon glyphicon-lock">重置密码</span></a></li>
+                <li><a href="/logout"><span class="glyphicon glyphicon-log-out">注销</span></a></li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="row">
+    <a href="/threads/read?thread_id={{ .ThreadID }}">
+        <div class="alert alert-warning col-sm-6 col-sm-offset-3">
+            <p>#{{ .ThreadID }}   最新回复于{{ .TimePassed }}分钟之前  创建于{{ .ThreadCreatedAt }}</p>
+            <p>
+                {{ .FirstPostContent }}
+                <span class="badge pull-right"> {{ .PostCount }}</span>
+            </p>
+        </div>
+    </a>
+</div>
+
+{{ end }}
+
+</body>
