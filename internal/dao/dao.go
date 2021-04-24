@@ -2,6 +2,7 @@ package dao
 
 import (
 	"GoProject/fudan_bbs/internal/model"
+	redis "github.com/go-redis/redis/v8"
 	"github.com/google/wire"
 	"github.com/jinzhu/gorm"
 )
@@ -56,13 +57,14 @@ type Dao interface {
 
 // struct Dao implements interface dao
 type dao struct {
-	ormDB *gorm.DB
+	mysql *gorm.DB
+	redis *redis.Client
 }
 
 // NewDao new a new Dao
 func NewDao(ormDB *gorm.DB) (d Dao, err error) {
 	d = &dao{
-		ormDB: ormDB,
+		mysql: ormDB,
 	}
 	return
 }

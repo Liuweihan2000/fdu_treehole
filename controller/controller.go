@@ -33,20 +33,21 @@ func index(c *gin.Context) {
 		msgErr(c, "读取全部主题错误", err)
 		return
 	}
-	for _, t := range threads {
+	for _, thread := range threads {
 		var index Index
-		index.ThreadCreatedAt = t.CreatedAt.Format("2006-01-02 15:04:05")
-		index.ThreadID = t.ID
+		index.ThreadCreatedAt = thread.CreatedAt.Format("2006-01-02 15:04:05")
+		index.ThreadID = thread.ID
 
-		count, err := DaoInstance.CountByThreadID(t.ID)
-		if err != nil {
-			msgErr(c, "通过主题ID读取帖子错误:", err)
-			return
-		}
+		count := thread.UserCommented
+		//count, err := DaoInstance.CountByThreadID(thread.ID)
+		//if err != nil {
+		//	msgErr(c, "通过主题ID读取帖子错误:", err)
+		//	return
+		//}
 		index.PostCount = count
 		firstPost, _ := DaoInstance.ReadFirstPostByThreadID(index.ThreadID)
 		index.FirstPostContent = firstPost.Content
-		timeDiff := utils.GetHourDiffer(t.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
+		timeDiff := utils.GetHourDiffer(thread.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
 		index.TimePassed = utils.GetTimeDiff(timeDiff)
 
 		data = append(data, index)
