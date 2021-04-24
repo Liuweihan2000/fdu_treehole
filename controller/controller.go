@@ -11,11 +11,12 @@ import (
 
 // 临时用于传入渲染的数据
 type Index struct {
-	ThreadID         int32
-	ThreadCreatedAt  string
-	PostCount        int32
-	FirstPostContent string
-	TimePassed       string
+	ThreadID         int32  `json:"thread_id"`
+	ThreadCreatedAt  string `json:"thread_created_at"`
+	PostCount        int32  `json:"post_count"`
+	FirstPostContent string `json:"first_post_content"`
+	TimePassed       string `json:"time_passed"`
+	ThreadUpdatedAt  string `json:"thread_updated_at"`
 }
 
 // index 获取所有主题，并渲染 /index.html 页面
@@ -45,8 +46,8 @@ func index(c *gin.Context) {
 		//	return
 		//}
 		index.PostCount = count
-		firstPost, _ := DaoInstance.ReadFirstPostByThreadID(index.ThreadID)
-		index.FirstPostContent = firstPost.Content
+		//firstPost, _ := DaoInstance.ReadFirstPostByThreadID(index.ThreadID)
+		//index.FirstPostContent = firstPost.Content
 		timeDiff := utils.GetHourDiffer(thread.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
 		index.TimePassed = utils.GetTimeDiff(timeDiff)
 
