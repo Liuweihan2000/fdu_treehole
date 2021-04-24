@@ -2,4 +2,4 @@ module github.com/my/repo
 
 go 1.15
 
-require github.com/go-redis/redis/v8 v8.8.2 // indirect
+require github.com/BurntSushi/toml v0.3.1
