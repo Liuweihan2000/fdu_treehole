@@ -187,7 +187,7 @@ func (d dao) LoadThreadsToRedis() error {
 	if err != nil {
 		return err
 	}
-	indices := make([]*common.Index, 0)
+	indices := make([]string, 0)
 	for i := len(threads) - 1; i >= 0; i-- {
 		thread := threads[i]
 		firstPost, err := d.ReadFirstPostByThreadID(int32(thread.ID))
@@ -201,8 +201,10 @@ func (d dao) LoadThreadsToRedis() error {
 			FirstPostContent: firstPost.Content,
 			ThreadUpdatedAt: thread.UpdatedAt.Format("2006-01-02 15:04:05"),
 		}
-		indices = append(indices, index)
+		indexStr, _ := utils.Marshal(index)
+		indices = append(indices, indexStr)
 	}
+	d.redis.LPush(ctx, "threads_refresh_every_30s", indices)
 
 	if needClear {
 		err := d.redis.LTrim(ctx, "threads_refresh_every_30s", 0, 30).Err()
