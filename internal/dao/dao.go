@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"GoProject/fudan_bbs/controller"
 	"GoProject/fudan_bbs/internal/model"
 	redis "github.com/go-redis/redis/v8"
 	"github.com/google/wire"
@@ -36,6 +37,7 @@ type Dao interface {
 	UpdateThreadIndex(ID int32, UserCommented int32) error
 	GetLastThreadID() (int32, error)
 	ReadAllThreadsByTime() ([]model.Thread, error)
+	GetBatchThreadsByTime() ([]*controller.Index, error) // 直接返回渲染页面所需要的内容
 	UpdateThreadTimeByID(ID int32) error
 	ReadUserFollowedThreadID(ID int32) ([]model.UserThread, error)
 	ReadUserFollowedThreads(Id int32) ([]model.Thread, error)

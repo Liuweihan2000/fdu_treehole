@@ -1,8 +1,10 @@
 package dao
 
 import (
+	"GoProject/fudan_bbs/controller"
 	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/internal/utils"
+	"context"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -142,6 +144,22 @@ func (d dao) GetLastThreadID() (ID int32, err error) {
 func (d dao) ReadAllThreadsByTime() (threads []model.Thread, err error) {
 	err = d.mysql.Order("updated_at desc").Find(&threads).Error
 	return
+}
+
+func (d dao) GetBatchThreadsByTime() ([]*controller.Index, error) {
+	slice, err := d.redis.LRange(context.Background(), "threads_refresh_every_30s", 0, 30).Result()
+	if err != nil {
+		return nil, err
+	}
+	res := make([]*controller.Index, 0)
+	for _, item := range slice {
+		index := &controller.Index{}
+		if err := utils.UnMarshal(item, index); err != nil {
+			return nil, err
+		}
+		res = append(res, index)
+	}
+	return res, nil
 }
 
 func (d dao) UpdateThreadTimeByID(ID int32) (err error) {

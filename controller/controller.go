@@ -27,34 +27,42 @@ func index(c *gin.Context) {
 	}
 
 	// 填充数据
-	var data []Index
+	// var data []Index
 
-	threads, err := DaoInstance.ReadAllThreadsByTime()
+	indices, err := DaoInstance.GetBatchThreadsByTime()
 	if err != nil {
-		msgErr(c, "读取全部主题错误", err)
+		msgErr(c, "读取主题错误", err)
 		return
 	}
-	for _, thread := range threads {
-		var index Index
-		index.ThreadCreatedAt = thread.CreatedAt.Format("2006-01-02 15:04:05")
-		index.ThreadID = thread.ID
-
-		count := thread.UserCommented
-		//count, err := DaoInstance.CountByThreadID(thread.ID)
-		//if err != nil {
-		//	msgErr(c, "通过主题ID读取帖子错误:", err)
-		//	return
-		//}
-		index.PostCount = count
-		//firstPost, _ := DaoInstance.ReadFirstPostByThreadID(index.ThreadID)
-		//index.FirstPostContent = firstPost.Content
-		timeDiff := utils.GetHourDiffer(thread.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
-		index.TimePassed = utils.GetTimeDiff(timeDiff)
-
-		data = append(data, index)
+	for _, index := range indices {
+		index.TimePassed = utils.GetTimeDiff(utils.GetHourDiffer(index.ThreadUpdatedAt, time.Now().Format("2006-01-02 15:04:05")))
 	}
+	//threads, err := DaoInstance.ReadAllThreadsByTime()
+	//if err != nil {
+	//	msgErr(c, "读取全部主题错误", err)
+	//	return
+	//}
+	//for _, thread := range threads {
+	//	var index Index
+	//	index.ThreadCreatedAt = thread.CreatedAt.Format("2006-01-02 15:04:05")
+	//	index.ThreadID = thread.ID
+	//
+	//	count := thread.UserCommented
+	//	//count, err := DaoInstance.CountByThreadID(thread.ID)
+	//	//if err != nil {
+	//	//	msgErr(c, "通过主题ID读取帖子错误:", err)
+	//	//	return
+	//	//}
+	//	index.PostCount = count
+	//	//firstPost, _ := DaoInstance.ReadFirstPostByThreadID(index.ThreadID)
+	//	//index.FirstPostContent = firstPost.Content
+	//	timeDiff := utils.GetHourDiffer(thread.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
+	//	index.TimePassed = utils.GetTimeDiff(timeDiff)
+	//
+	//	data = append(data, index)
+	//}
 
-	html(c, data, "layout", "index")
+	html(c, indices, "layout", "index")
 }
 
 // err 根据传入的msg URL参数来渲染 /err 错误页面
