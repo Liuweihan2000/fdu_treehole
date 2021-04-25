@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"GoProject/fudan_bbs/common"
 	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/internal/utils"
 	"fmt"
@@ -152,7 +153,7 @@ func searchThread(c *gin.Context) {
 		return
 	}
 	// 填充数据
-	var data Index
+	var data common.Index
 
 	ID, err := strconv.Atoi(c.Query("thread_id"))
 	if err != nil {
@@ -217,7 +218,7 @@ func readFollowThread(c *gin.Context) {
 		return
 	}
 
-	var data []Index
+	var data []common.Index
 	s, _ := session(c)
 
 	threads, err := DaoInstance.ReadUserFollowedThreads(s.UserID)
@@ -226,7 +227,7 @@ func readFollowThread(c *gin.Context) {
 		return
 	}
 	for _, t := range threads {
-		var index Index
+		var index common.Index
 		index.ThreadCreatedAt = t.CreatedAt.Format("2006-01-02 15:04:05")
 		index.ThreadID = t.ID
 

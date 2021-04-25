@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"GoProject/fudan_bbs/controller"
+	"GoProject/fudan_bbs/common"
 	"GoProject/fudan_bbs/internal/model"
 	redis "github.com/go-redis/redis/v8"
 	"github.com/google/wire"
@@ -37,7 +37,8 @@ type Dao interface {
 	UpdateThreadIndex(ID int32, UserCommented int32) error
 	GetLastThreadID() (int32, error)
 	ReadAllThreadsByTime() ([]model.Thread, error)
-	GetBatchThreadsByTime() ([]*controller.Index, error) // 直接返回渲染页面所需要的内容
+	GetBatchThreadsByTime() ([]*common.Index, error) // 直接返回渲染页面所需要的内容
+	LoadThreadsToRedis() error // 将mysql中的thread数据定时装入redis中
 	UpdateThreadTimeByID(ID int32) error
 	ReadUserFollowedThreadID(ID int32) ([]model.UserThread, error)
 	ReadUserFollowedThreads(Id int32) ([]model.Thread, error)
@@ -64,9 +65,7 @@ type dao struct {
 }
 
 // NewDao new a new Dao
-func NewDao(ormDB *gorm.DB) (d Dao, err error) {
-	d = &dao{
-		mysql: ormDB,
-	}
+func NewDao(d1 dao) (d dao, err error) {
+	d = d1
 	return
 }

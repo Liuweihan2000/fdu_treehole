@@ -17,15 +17,11 @@ func InitApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	daoDao, err := dao.NewDao(db)
-	if err != nil {
-		return nil, err
-	}
 	engine, err := controller.NewServer()
 	if err != nil {
 		return nil, err
 	}
-	app, err := NewApp(daoDao, engine)
+	app, err := NewApp(db, engine)
 	if err != nil {
 		return nil, err
 	}

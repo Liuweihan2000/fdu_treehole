@@ -1,23 +1,28 @@
 package dao
 
 import (
-	"GoProject/fudan_bbs/controller"
+	"GoProject/fudan_bbs/common"
 	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/internal/utils"
 	"context"
+	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"time"
 )
 
-//func (d *Dao) QueryUserByID(ID int32) (UserInfo model.User) {
-//
-//	return
-//}
-
-// NewDB new a new gormDB
-func NewDB() (ormDB *gorm.DB, err error) {
-	ormDB, err = gorm.Open("mysql", "root:@tcp(127.0.0.1:3306)/bbs?charset=utf8mb4&parseTime=True&loc=Local")
+// NewDB new a new gormDB and a redis client
+func NewDB() (d dao, err error) {
+	ormDB, err := gorm.Open("mysql", "root:@tcp(127.0.0.1:3306)/bbs?charset=utf8mb4&parseTime=True&loc=Local")
+	r := redis.NewClient(
+		&redis.Options{
+			Addr: "localhost:6379",
+			Password: "",
+			DB: 0,
+		},
+	)
+	d.mysql = ormDB
+	d.redis = r
 	return
 }
 
@@ -146,20 +151,67 @@ func (d dao) ReadAllThreadsByTime() (threads []model.Thread, err error) {
 	return
 }
 
-func (d dao) GetBatchThreadsByTime() ([]*controller.Index, error) {
+func (d dao) GetBatchThreadsByTime() ([]*common.Index, error) {
 	slice, err := d.redis.LRange(context.Background(), "threads_refresh_every_30s", 0, 30).Result()
 	if err != nil {
 		return nil, err
 	}
-	res := make([]*controller.Index, 0)
+	res := make([]*common.Index, 0)
 	for _, item := range slice {
-		index := &controller.Index{}
+		index := &common.Index{}
 		if err := utils.UnMarshal(item, index); err != nil {
 			return nil, err
 		}
 		res = append(res, index)
 	}
 	return res, nil
+}
+
+// 1 2 3 11 22 33
+// 倒序插入redis
+func (d dao) LoadThreadsToRedis() error {
+	ctx := context.Background()
+	curLen, err := d.redis.LLen(ctx, "threads_refresh_every_30s").Result()
+	if err != nil {
+		return err
+	}
+	var needClear bool
+	if curLen == 0 {
+		needClear = false
+	} else {
+		needClear = true
+	}
+
+	threads := make([]*model.Thread, 0)
+	err = d.mysql.Order("updated_at desc").Find(&threads).Limit(30).Error
+	if err != nil {
+		return err
+	}
+	indices := make([]*common.Index, 0)
+	for i := len(threads) - 1; i >= 0; i-- {
+		thread := threads[i]
+		firstPost, err := d.ReadFirstPostByThreadID(int32(thread.ID))
+		if err != nil {
+			return err
+		}
+		index := &common.Index{
+			ThreadID: thread.ID,
+			ThreadCreatedAt: thread.CreatedAt.Format("2006-01-02 15:04:05"),
+			PostCount: thread.UserCommented,
+			FirstPostContent: firstPost.Content,
+			ThreadUpdatedAt: thread.UpdatedAt.Format("2006-01-02 15:04:05"),
+		}
+		indices = append(indices, index)
+	}
+
+	if needClear {
+		err := d.redis.LTrim(ctx, "threads_refresh_every_30s", 0, 30).Err()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (d dao) UpdateThreadTimeByID(ID int32) (err error) {

@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -30,28 +29,11 @@ func TestRedisClient(t *testing.T) {
 func TestRedisThread(t *testing.T) {
 	rdb := NewRedisClient()
 
-	index := &Index{
-		ThreadID: 11,
-		ThreadCreatedAt: "2021-3-12 08:56:38",
-		PostCount: 22,
-		FirstPostContent: "请问有人出英语视听教材吗",
-		ThreadUpdatedAt: "2021-4-14 16:14:28",
+	res, err := rdb.LRange(context.Background(), "123123", 0, -1).Result()
+	if err != nil {
+		fmt.Printf("ERR: %v", err)
+		fmt.Println()
 	}
-	bytes, _ := json.Marshal(index)
-	str := string(bytes)
-
-	cmd := rdb.LPush(context.Background(), "thread_list", str)
-	if cmd != nil {
-		fmt.Println(cmd)
-	}
-
-	redisSlice, e := rdb.LRange(context.Background(), "thread_list", 0, -1).Result()
-	if e != nil {
-		fmt.Println(e)
-	}
-	redisStr := redisSlice[0]
-	fmt.Println(redisStr)
-	indexStruct := &Index{}
-	json.Unmarshal([]byte(redisStr), indexStruct)
-	fmt.Println(indexStruct)
+	fmt.Println("RES:")
+	fmt.Println(res)
 }

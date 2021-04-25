@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 type Server struct {
@@ -10,13 +11,14 @@ type Server struct {
 }
 
 func NewServer() (e *gin.Engine, err error) {
-	//var conf struct{
-	//	Addr string
-	//}
-	//_, err = toml.DecodeFile("../config/config.toml", &conf)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
+	// 启动定时任务
+	ticker := time.NewTicker(time.Second * 5)
+	go func() {
+		for _ = range ticker.C {
+			DaoInstance.LoadThreadsToRedis()
+		}
+	}()
+
 	engine := gin.Default()
 	InitRouter(engine)
 	go func() {
