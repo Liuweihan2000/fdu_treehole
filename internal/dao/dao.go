@@ -31,7 +31,7 @@ type Dao interface {
 
 	// threads
 	ReadAllThreads() ([]model.Thread, error)
-	CreateThread(thread model.Thread) error
+	CreateThread(thread *model.Thread) error
 	ReadThreadByUUID(UUID string) (model.Thread, error)
 	ReadThreadByID(ID int32) (model.Thread, error)
 	UpdateThreadIndex(ID int32, UserCommented int32) error
@@ -46,7 +46,7 @@ type Dao interface {
 	// posts
 	CountByThreadID(ID int32) (int32, error)
 	ReadPostsByThreadID(ID int32) ([]model.Post, error)
-	CreatePost(post model.Post) error
+	CreatePost(post *model.Post) error
 	ReadFirstPostByThreadID(ID int32) (model.Post, error)
 
 	// thread->user

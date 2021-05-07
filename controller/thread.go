@@ -43,35 +43,28 @@ func createThreadAction(c *gin.Context) {
 		UserID:        user.ID,
 		UserCommented: 0,
 	}
-	if err = DaoInstance.CreateThread(t); err != nil {
+	if err = DaoInstance.CreateThread(&t); err != nil {
 		msgErr(c, "创建主题错误:", err)
 		return
 	}
-
-	// fmt.Printf("\n\n%v\n\n", t.ID)
-
-	thread_id, err := DaoInstance.GetLastThreadID()
-	if err != nil {
-		msgErr(c, "查询最后一个ThreadID错误:", err)
-		return
-	}
+	threadID := t.ID
 
 	// 创建主题的同时创建第一条回复
 	post := model.Post{
 		Content:   c.PostForm("content"),
 		UserID:    user.ID,
-		ThreadID:  thread_id,
+		ThreadID:  threadID,
 		UserName:  "洞主",
 		CreatedAt: time.Now(),
 	}
-	if err = DaoInstance.CreatePost(post); err != nil {
+	if err = DaoInstance.CreatePost(&post); err != nil {
 		msgErr(c, "创建主题错误:", err)
 		return
 	}
 
-	_ = DaoInstance.CreateThreadUserPair(thread_id, user.ID, 0)
-	_ = DaoInstance.UpdateThreadIndex(thread_id, 1)
-	_ = DaoInstance.UpdateThreadTimeByID(thread_id)
+	_ = DaoInstance.CreateThreadUserPair(threadID, user.ID, 0)
+	_ = DaoInstance.UpdateThreadIndex(threadID, 1)
+	_ = DaoInstance.UpdateThreadTimeByID(threadID)
 	c.Redirect(http.StatusFound, "/")
 }
 

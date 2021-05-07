@@ -66,7 +66,7 @@ func createPostAction(c *gin.Context) {
 	}
 
 	// 创建回复
-	err = DaoInstance.CreatePost(post)
+	err = DaoInstance.CreatePost(&post)
 	if err != nil {
 		msgErr(c, "回复帖子出错:", err)
 		return

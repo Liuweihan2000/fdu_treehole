@@ -118,7 +118,7 @@ func (d dao) ReadAllThreads() (threads []model.Thread, err error) {
 	return
 }
 
-func (d dao) CreateThread(thread model.Thread) (err error) {
+func (d dao) CreateThread(thread *model.Thread) (err error) {
 	err = d.mysql.Create(&thread).Error
 	return
 }
@@ -252,7 +252,7 @@ func (d dao) ReadPostsByThreadID(ID int32) (posts []model.Post, err error) {
 	return
 }
 
-func (d dao) CreatePost(post model.Post) (err error) {
+func (d dao) CreatePost(post *model.Post) (err error) {
 	err = d.mysql.Create(&post).Error
 	return
 }
