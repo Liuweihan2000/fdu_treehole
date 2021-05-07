@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 // index 获取所有主题，并渲染 /index.html 页面
 func index(c *gin.Context) {
 	if !logged(c) {

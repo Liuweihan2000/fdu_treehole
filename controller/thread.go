@@ -37,18 +37,20 @@ func createThreadAction(c *gin.Context) {
 		return
 	}
 
+	// TODO: 开启一个事务，将下面的三个操作放在同一个事务中作为原子操作
 	// 为该用户建立主题
+	now := time.Now()
 	t := model.Thread{
-		CreatedAt:     time.Now(),
+		CreatedAt:     now,
+		UpdatedAt:     now,
 		UserID:        user.ID,
-		UserCommented: 0,
+		UserCommented: 1,
 	}
 	if err = DaoInstance.CreateThread(&t); err != nil {
 		msgErr(c, "创建主题错误:", err)
 		return
 	}
 	threadID := t.ID
-
 	// 创建主题的同时创建第一条回复
 	post := model.Post{
 		Content:   c.PostForm("content"),
@@ -63,8 +65,6 @@ func createThreadAction(c *gin.Context) {
 	}
 
 	_ = DaoInstance.CreateThreadUserPair(threadID, user.ID, 0)
-	_ = DaoInstance.UpdateThreadIndex(threadID, 1)
-	_ = DaoInstance.UpdateThreadTimeByID(threadID)
 	c.Redirect(http.StatusFound, "/")
 }
 

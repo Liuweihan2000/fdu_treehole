@@ -32,7 +32,7 @@ func loginAction(c *gin.Context) {
 	}
 
 	// 建立 session
-	// 如果session已经存在就不再添加了
+	// 如果 session 已经存在就不再添加了
 	err = DaoInstance.ReadSessionByUserID(user.ID)
 	if err != nil { // 数据库还没有对应的 session 记录
 		fmt.Println(err)
