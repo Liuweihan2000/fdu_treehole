@@ -7,13 +7,13 @@ package di
 
 import (
 	"GoProject/fudan_bbs/controller"
-	"GoProject/fudan_bbs/internal/dao"
+	"GoProject/fudan_bbs/internal/dal"
 )
 
 // Injectors from wire.go:
 
 func InitApp() (*App, error) {
-	db, err := dao.NewDB()
+	db, err := dal.NewDB()
 	if err != nil {
 		return nil, err
 	}

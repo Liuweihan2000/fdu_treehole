@@ -1,7 +1,7 @@
 package controller
 
 import (
-	d "GoProject/fudan_bbs/internal/dao"
+	d "GoProject/fudan_bbs/internal/dal"
 	"GoProject/fudan_bbs/internal/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"

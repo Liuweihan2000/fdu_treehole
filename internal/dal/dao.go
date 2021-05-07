@@ -1,4 +1,4 @@
-package dao
+package dal
 
 import (
 	"GoProject/fudan_bbs/common"
@@ -10,7 +10,7 @@ import (
 
 var Provider = wire.NewSet(NewDao, NewDB)
 
-type Dao interface {
+type DaoInterface interface {
 
 	// users
 	QueryUserByEmail(email string) (model.User, error)
@@ -58,14 +58,14 @@ type Dao interface {
 	QueryUserThreadPair(UserID, ThreadID int32) error
 }
 
-// struct Dao implements interface dao
-type dao struct {
+// struct DaoInterface implements interface Dao
+type Dao struct {
 	mysql *gorm.DB
 	redis *redis.Client
 }
 
-// NewDao new a new Dao
-func NewDao(d1 dao) (d dao, err error) {
+// NewDao new a new DaoInterface
+func NewDao(d1 Dao) (d Dao, err error) {
 	d = d1
 	return
 }
