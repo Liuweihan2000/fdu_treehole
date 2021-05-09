@@ -1,7 +1,8 @@
 package controller
 
 import (
-	"GoProject/fudan_bbs/internal/utils"
+	"GoProject/fudan_bbs/dal"
+	"GoProject/fudan_bbs/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"html/template"
@@ -19,7 +20,7 @@ func index(c *gin.Context) {
 	// 填充数据
 	// var data []Index
 
-	indices, err := DaoInstance.GetBatchThreadsByTime()
+	indices, err := dal.GetBatchThreadsByTime()
 	if err != nil {
 		msgErr(c, "读取主题错误", err)
 		return

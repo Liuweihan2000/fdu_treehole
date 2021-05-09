@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +19,7 @@ func MD5(str string) string {
 }
 
 func MD5WithSalt(str string) string {
-	target := str + "saltString" + "@fudan.edu.cn"
+	target := str + viper.GetString("email_hash") + "@fudan.edu.cn"
 	h := md5.New()
 	h.Write([]byte(target))
 	return hex.EncodeToString(h.Sum(nil))

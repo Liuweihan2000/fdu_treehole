@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"GoProject/fudan_bbs/dal"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,7 +15,7 @@ func logout(c *gin.Context) {
 	}
 
 	// 删除 session
-	if err := DaoInstance.DeleteSession(s.ID); err != nil {
+	if err := dal.DeleteSession(s.ID); err != nil {
 		msgErr(c, "删除会话错误:", err)
 		return
 	}

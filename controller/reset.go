@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"GoProject/fudan_bbs/dal"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,7 +19,7 @@ func resetAction(c *gin.Context) {
 	newPassword := c.PostForm("newPassword")
 
 	// 根据 email 读取 user
-	user, err := DaoInstance.QueryUserByEmail(email)
+	user, err := dal.QueryUserByEmail(email)
 	if err != nil {
 		msgErr(c, "通过邮箱读取用户错误: ", err)
 		return
@@ -31,7 +32,7 @@ func resetAction(c *gin.Context) {
 	}
 
 	// 修改密码
-	err = DaoInstance.ResetUserPassword(email, newPassword)
+	err = dal.ResetUserPassword(email, newPassword)
 	if err != nil {
 		msgErr(c, "修改密码错误", err)
 		return

@@ -1,8 +1,9 @@
 package controller
 
 import (
+	"GoProject/fudan_bbs/dal"
 	"GoProject/fudan_bbs/internal/model"
-	"GoProject/fudan_bbs/internal/utils"
+	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,6 +36,6 @@ func session(c *gin.Context) (s model.Session, err error) {
 
 	// 根据 uuid 读取 session
 	// fmt.Println(cookie.Value)
-	s, err = DaoInstance.ReadSessionByEmailHash(cookie.Value)
+	s, err = dal.ReadSessionByEmailHash(cookie.Value)
 	return
 }

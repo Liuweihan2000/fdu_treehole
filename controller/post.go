@@ -1,8 +1,9 @@
 package controller
 
 import (
+	"GoProject/fudan_bbs/dal"
 	"GoProject/fudan_bbs/internal/model"
-	"GoProject/fudan_bbs/internal/utils"
+	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -24,14 +25,14 @@ func createPostAction(c *gin.Context) {
 		return
 	}
 
-	thread, err := DaoInstance.ReadThreadByID(int32(ID))
+	thread, err := dal.ReadThreadByID(int32(ID))
 	if err != nil {
 		msgErr(c, "通过id读取主题错误:", err)
 		return
 	}
 
 	// user由session决定，而不是thread
-	user, err := DaoInstance.QueryUserByID(s.UserID)
+	user, err := dal.QueryUserByID(s.UserID)
 	if err != nil {
 		msgErr(c, "通过user_id读取user错误:", err)
 		return
@@ -40,16 +41,16 @@ func createPostAction(c *gin.Context) {
 	var NickName string
 	userNum := thread.UserCommented
 
-	index, err := DaoInstance.QueryThreadUserPair(thread.ID, user.ID)
+	index, err := dal.QueryThreadUserPair(thread.ID, user.ID)
 	if err != nil { // 新来的评论，添加thread_user pair
 		NickName = utils.NameList[userNum]
 		// 更新 thread
-		err = DaoInstance.UpdateThreadIndex(int32(ID), userNum+1)
+		err = dal.UpdateThreadIndex(int32(ID), userNum+1)
 		if err != nil {
 			msgErr(c, "更新 thread 出错: ", err)
 		}
 		// 添加 thread-user pair
-		err = DaoInstance.CreateThreadUserPair(thread.ID, user.ID, userNum)
+		err = dal.CreateThreadUserPair(thread.ID, user.ID, userNum)
 		if err != nil {
 			msgErr(c, "添加thread-user pair出错: ", err)
 		}
@@ -66,13 +67,13 @@ func createPostAction(c *gin.Context) {
 	}
 
 	// 创建回复
-	err = DaoInstance.CreatePost(&post)
+	err = dal.CreatePost(&post)
 	if err != nil {
 		msgErr(c, "回复帖子出错:", err)
 		return
 	}
 
-	err = DaoInstance.UpdateThreadTimeByID(thread.ID)
+	err = dal.UpdateThreadTimeByID(thread.ID)
 	if err != nil {
 		msgErr(c, "更新帖子时间出错:", err)
 		return

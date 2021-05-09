@@ -1,0 +1,10 @@
+### redis 配置
+redis_source: 127.0.0.1:6379
+redis_password: 123456
+
+
+### debug 模式
+debugging: true
+
+### salt added to user email when applying md5 hashing
+email_hash: hashString

@@ -2,8 +2,9 @@ package controller
 
 import (
 	"GoProject/fudan_bbs/common"
+	"GoProject/fudan_bbs/dal"
 	"GoProject/fudan_bbs/internal/model"
-	"GoProject/fudan_bbs/internal/utils"
+	"GoProject/fudan_bbs/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -31,7 +32,7 @@ func createThreadAction(c *gin.Context) {
 	}
 
 	// 读取 session 对应的用户
-	user, err := DaoInstance.QueryUserByID(s.UserID)
+	user, err := dal.QueryUserByID(s.UserID)
 	if err != nil {
 		msgErr(c, "通过ID读取用户错误:", err)
 		return
@@ -46,7 +47,7 @@ func createThreadAction(c *gin.Context) {
 		UserID:        user.ID,
 		UserCommented: 1,
 	}
-	if err = DaoInstance.CreateThread(&t); err != nil {
+	if err = dal.CreateThread(&t); err != nil {
 		msgErr(c, "创建主题错误:", err)
 		return
 	}
@@ -59,12 +60,12 @@ func createThreadAction(c *gin.Context) {
 		UserName:  "洞主",
 		CreatedAt: time.Now(),
 	}
-	if err = DaoInstance.CreatePost(&post); err != nil {
+	if err = dal.CreatePost(&post); err != nil {
 		msgErr(c, "创建主题错误:", err)
 		return
 	}
 
-	_ = DaoInstance.CreateThreadUserPair(threadID, user.ID, 0)
+	_ = dal.CreateThreadUserPair(threadID, user.ID, 0)
 	c.Redirect(http.StatusFound, "/")
 }
 
@@ -96,7 +97,7 @@ func readThread(c *gin.Context) {
 	// 填充数据
 	var data ReadThread
 	ID, _ := strconv.Atoi(c.Query("thread_id"))
-	thread, err := DaoInstance.ReadThreadByID(int32(ID))
+	thread, err := dal.ReadThreadByID(int32(ID))
 	if err != nil {
 		msgErr(c, "通过ID读取帖子错误:", err)
 		return
@@ -104,13 +105,13 @@ func readThread(c *gin.Context) {
 	data.ThreadCreatedAt = thread.CreatedAt.Format("2006-01-02 15:04:05")
 	data.ThreadID = thread.ID
 
-	count, err := DaoInstance.CountByThreadID(thread.ID)
+	count, err := dal.CountByThreadID(thread.ID)
 	if err != nil {
 		count = 0
 	}
-	data.PostCount = count
+	data.PostCount = int32(count)
 	s, _ := session(c)
-	err = DaoInstance.QueryUserThreadPair(s.UserID, int32(ID))
+	err = dal.QueryUserThreadPair(s.UserID, int32(ID))
 	if err == nil { // 找到记录，说明用户已经收藏了这个帖子
 		data.Followed = true
 	} else {
@@ -119,7 +120,7 @@ func readThread(c *gin.Context) {
 
 	// 如果上面的 count == 0 的话说明这个话题下还没有帖子
 	if count != 0 {
-		posts, err := DaoInstance.ReadPostsByThreadID(thread.ID)
+		posts, err := dal.ReadPostsByThreadID(thread.ID)
 		if err != nil {
 			msgErr(c, "通过主题ID读取帖子错误:", err)
 			return
@@ -156,7 +157,7 @@ func searchThread(c *gin.Context) {
 
 	utils.Debug(ID)
 
-	t, err := DaoInstance.ReadThreadByID(int32(ID))
+	t, err := dal.ReadThreadByID(int32(ID))
 	if err != nil {
 		msgErr(c, "读取主题错误", err)
 		return
@@ -165,13 +166,13 @@ func searchThread(c *gin.Context) {
 	data.ThreadCreatedAt = t.CreatedAt.Format("2006-01-02 15:04:05")
 	data.ThreadID = t.ID
 
-	count, err := DaoInstance.CountByThreadID(t.ID)
+	count, err := dal.CountByThreadID(t.ID)
 	if err != nil {
 		msgErr(c, "通过主题ID读取帖子错误:", err)
 		return
 	}
-	data.PostCount = count
-	firstPost, _ := DaoInstance.ReadFirstPostByThreadID(data.ThreadID)
+	data.PostCount = int32(count)
+	firstPost, _ :=dal.ReadFirstPostByThreadID(data.ThreadID)
 	data.FirstPostContent = firstPost.Content
 	timeDiff := utils.GetHourDiffer(t.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
 	data.TimePassed = utils.GetTimeDiff(timeDiff)
@@ -195,7 +196,7 @@ func followThreadAction(c *gin.Context) {
 
 	userID := s.UserID
 
-	if err = DaoInstance.CreateUserThreadPair(userID, int32(threadID)); err != nil {
+	if err = dal.CreateUserThreadPair(userID, int32(threadID)); err != nil {
 		msgErr(c, "收藏出错:", err)
 		return
 	}
@@ -214,7 +215,7 @@ func readFollowThread(c *gin.Context) {
 	var data []common.Index
 	s, _ := session(c)
 
-	threads, err := DaoInstance.ReadUserFollowedThreads(s.UserID)
+	threads, err := dal.ReadUserFollowedThreads(s.UserID)
 	if err != nil {
 		msgErr(c, "读取全部主题错误", err)
 		return
@@ -224,13 +225,13 @@ func readFollowThread(c *gin.Context) {
 		index.ThreadCreatedAt = t.CreatedAt.Format("2006-01-02 15:04:05")
 		index.ThreadID = t.ID
 
-		count, err := DaoInstance.CountByThreadID(t.ID)
+		count, err := dal.CountByThreadID(t.ID)
 		if err != nil {
 			msgErr(c, "通过主题ID读取帖子错误:", err)
 			return
 		}
-		index.PostCount = count
-		firstPost, _ := DaoInstance.ReadFirstPostByThreadID(index.ThreadID)
+		index.PostCount = int32(count)
+		firstPost, _ := dal.ReadFirstPostByThreadID(index.ThreadID)
 		index.FirstPostContent = firstPost.Content
 		timeDiff := utils.GetHourDiffer(t.UpdatedAt.Format("2006-01-02 15:04:05"), time.Now().Format("2006-01-02 15:04:05"))
 		index.TimePassed = utils.GetTimeDiff(timeDiff)

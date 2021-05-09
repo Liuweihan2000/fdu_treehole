@@ -1,32 +1,18 @@
 package controller
 
 import (
-	"fmt"
+	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
-type Server struct {
-	e *gin.Engine
-}
-
-func NewServer() (e *gin.Engine, err error) {
-	// 启动定时任务
-	ticker := time.NewTicker(time.Second * 5)
-	go func() {
-		for _ = range ticker.C {
-			DaoInstance.LoadThreadsToRedis()
-		}
-	}()
-
+// TODO: 在init的时候修改这里
+func InitServer() *gin.Engine {
 	engine := gin.Default()
 	InitRouter(engine)
 	go func() {
-		if e := engine.Run(":9999"); e != nil {
-			fmt.Println(e)
-		}
+		utils.FatalErrorHandle(engine.Run(":9999"), "error occurred while initializing server")
 	}()
-	return
+	return engine
 }
 
 func InitRouter(e *gin.Engine) {

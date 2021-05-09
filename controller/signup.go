@@ -1,8 +1,9 @@
 package controller
 
 import (
+	"GoProject/fudan_bbs/dal"
 	"GoProject/fudan_bbs/internal/model"
-	"GoProject/fudan_bbs/internal/utils"
+	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -23,7 +24,7 @@ func signUpAction(c *gin.Context) {
 		return
 	}
 	// read the form and create a user
-	if _, err := DaoInstance.CreateUser(u.EmailHash, u.Password); err != nil {
+	if _, err := dal.CreateUser(u.EmailHash, u.Password); err != nil {
 		msgErr(c, "创建用户错误", err)
 		return
 	}
