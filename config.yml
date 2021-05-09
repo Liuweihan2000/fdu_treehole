@@ -3,7 +3,7 @@ redis_source: 127.0.0.1:6379
 redis_password: 123456
 
 ### mysql 配置
-sql_source:
+sql_source: root:@tcp(127.0.0.1:3306)/bbs?
 
 ### debug 模式
 debugging: true

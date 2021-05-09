@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -9,9 +8,6 @@ import (
 func InitServer() *gin.Engine {
 	engine := gin.Default()
 	InitRouter(engine)
-	go func() {
-		utils.FatalErrorHandle(engine.Run(":9999"), "error occurred while initializing server")
-	}()
 	return engine
 }
 

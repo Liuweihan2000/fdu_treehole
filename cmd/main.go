@@ -5,6 +5,7 @@ import (
 	"GoProject/fudan_bbs/controller"
 	"GoProject/fudan_bbs/cronjob"
 	"GoProject/fudan_bbs/dal"
+	"GoProject/fudan_bbs/utils"
 )
 
 //func main() {
@@ -32,5 +33,6 @@ func main() {
 	config.InitConfigFile()
 	dal.InitDal()
 	cronjob.InitCronJob()
-	controller.InitServer()
+	engine := controller.InitServer()
+	utils.FatalErrorHandle(engine.Run(":9999"), "error occurred while initializing server")
 }
