@@ -2,7 +2,6 @@ package controller
 
 import (
 	"GoProject/fudan_bbs/dal"
-	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +25,7 @@ func logged(c *gin.Context) bool {
 }
 
 // session 根据 cookie 读取session
-func session(c *gin.Context) (s model.Session, err error) {
+func session(c *gin.Context) (s dal.Session, err error) {
 	// 读取 cookie，值为 session 的 uuid
 	cookie, err := c.Request.Cookie("cookie")
 	if err != nil {

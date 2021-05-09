@@ -2,7 +2,6 @@ package controller
 
 import (
 	"GoProject/fudan_bbs/dal"
-	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -58,7 +57,7 @@ func createPostAction(c *gin.Context) {
 		NickName = utils.NameList[index]
 	}
 
-	post := model.Post{
+	post := dal.Post{
 		Content:   c.PostForm("content"),
 		UserID:    user.ID,
 		ThreadID:  thread.ID,

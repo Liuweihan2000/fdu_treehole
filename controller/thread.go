@@ -3,7 +3,6 @@ package controller
 import (
 	"GoProject/fudan_bbs/common"
 	"GoProject/fudan_bbs/dal"
-	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -41,7 +40,7 @@ func createThreadAction(c *gin.Context) {
 	// TODO: 开启一个事务，将下面的三个操作放在同一个事务中作为原子操作
 	// 为该用户建立主题
 	now := time.Now()
-	t := model.Thread{
+	t := dal.Thread{
 		CreatedAt:     now,
 		UpdatedAt:     now,
 		UserID:        user.ID,
@@ -53,7 +52,7 @@ func createThreadAction(c *gin.Context) {
 	}
 	threadID := t.ID
 	// 创建主题的同时创建第一条回复
-	post := model.Post{
+	post := dal.Post{
 		Content:   c.PostForm("content"),
 		UserID:    user.ID,
 		ThreadID:  threadID,

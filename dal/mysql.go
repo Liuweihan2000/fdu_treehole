@@ -2,7 +2,6 @@ package dal
 
 import (
 	"GoProject/fudan_bbs/common"
-	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/utils"
 	"context"
 	"gorm.io/gorm"
@@ -16,18 +15,18 @@ func MySQL() *gorm.DB {
 }
 
 // TODO: 这里需要改一下
-func QueryUserByEmail(email string) (user model.User, err error) {
+func QueryUserByEmail(email string) (user User, err error) {
 	err = MySQL().Where("email_hash = ?", email).First(&user).Error
 	return
 }
 
-func QueryUserByID(ID int32) (user model.User, err error) {
+func QueryUserByID(ID int32) (user User, err error) {
 	err = MySQL().Where("id = ?", ID).First(&user).Error
 	return
 }
 
-func CreateUser(EmailHash string, Password string) (user model.User, err error) {
-	user = model.User{
+func CreateUser(EmailHash string, Password string) (user User, err error) {
+	user = User{
 		EmailHash: EmailHash,
 		Password:  utils.MD5(Password),
 	}
@@ -36,7 +35,7 @@ func CreateUser(EmailHash string, Password string) (user model.User, err error) 
 }
 
 func ResetUserPassword(Email string, newPassword string) (err error) {
-	user := model.User{}
+	user := User{}
 	// 调用这个函数之前已经处理过 email 不存在的错误了，所以不用处理下面这段代码可能的错误
 	MySQL().Where("email = ?", Email).First(&user)
 	user.Password = utils.Hash(newPassword)
@@ -44,44 +43,44 @@ func ResetUserPassword(Email string, newPassword string) (err error) {
 	return
 }
 
-func QueryUserByEmailHash(EmailHash string) (user model.User, err error) {
+func QueryUserByEmailHash(EmailHash string) (user User, err error) {
 	err = MySQL().Where("email_hash = ?", EmailHash).First(&user).Error
 	return
 }
 
 // sessions
-func CreateSessionByID(ID int32) (session model.Session, err error) {
+func CreateSessionByID(ID int32) (session Session, err error) {
 	session.UserID = ID
 	err = MySQL().Create(&session).Error
 	return
 }
 
-func ReadSessionByUUID(UUID string) (session model.Session, err error) {
+func ReadSessionByUUID(UUID string) (session Session, err error) {
 	err = MySQL().Where("uuid = ?", UUID).First(&session).Error
 	return
 }
 
 func ReadSessionByUserID(ID int32) (err error) {
 	// 如果能找到对应记录，则返回nil
-	session := model.Session{}
+	session := Session{}
 	err = MySQL().Where("user_id = ?", ID).First(&session).Error
 	return
 }
 
-func ReadSessionByEmailHash(hash string) (session model.Session, err error) {
+func ReadSessionByEmailHash(hash string) (session Session, err error) {
 	err = MySQL().Where("email_hash = ?", hash).First(&session).Error
 	return
 }
 
 func DeleteSession(ID int32) (err error) {
-	session := model.Session{
+	session := Session{
 		ID: ID,
 	}
 	err = MySQL().Delete(&session).Error
 	return
 }
 
-func CreateSession(UserID int32, EmailHash string) (session model.Session, err error) {
+func CreateSession(UserID int32, EmailHash string) (session Session, err error) {
 	session.UserID = UserID
 	session.EmailHash = EmailHash
 	err = MySQL().Create(&session).Error
@@ -89,41 +88,41 @@ func CreateSession(UserID int32, EmailHash string) (session model.Session, err e
 }
 
 // threads
-func  ReadAllThreads() (threads []model.Thread, err error) {
+func  ReadAllThreads() (threads []Thread, err error) {
 	result := MySQL().Find(&threads)
 	err = result.Error
 	return
 }
 
-func CreateThread(thread *model.Thread) (err error) {
+func CreateThread(thread *Thread) (err error) {
 	err = MySQL().Create(&thread).Error
 	return
 }
 
-func  ReadThreadByUUID(UUID string) (thread model.Thread, err error) {
+func  ReadThreadByUUID(UUID string) (thread Thread, err error) {
 	err = MySQL().Where("uuid = ?", UUID).First(&thread).Error
 	return
 }
 
-func ReadThreadByID(ID int32) (thread model.Thread, err error) {
+func ReadThreadByID(ID int32) (thread Thread, err error) {
 	err = MySQL().Where("id = ?", ID).First(&thread).Error
 	return
 }
 
 func  UpdateThreadIndex(ID int32, UserCommented int32) (err error) {
-	thread := model.Thread{}
+	thread := Thread{}
 	err = MySQL().Model(&thread).Where("id = ?", ID).Update("user_commented", UserCommented).Error
 	return
 }
 
 func GetLastThreadID() (ID int32, err error) {
-	thread := model.Thread{}
+	thread := Thread{}
 	err = MySQL().Last(&thread).Error
 	ID = thread.ID
 	return
 }
 
-func  ReadAllThreadsByTime() (threads []model.Thread, err error) {
+func  ReadAllThreadsByTime() (threads []Thread, err error) {
 	err = MySQL().Order("updated_at desc").Find(&threads).Error
 	return
 }
@@ -159,7 +158,7 @@ func LoadThreadsToRedis() error {
 		needClear = true
 	}
 
-	threads := make([]*model.Thread, 0)
+	threads := make([]*Thread, 0)
 	err = MySQL().Order("updated_at desc").Find(&threads).Limit(30).Error
 	if err != nil {
 		return err
@@ -194,17 +193,17 @@ func LoadThreadsToRedis() error {
 }
 
 func UpdateThreadTimeByID(ID int32) (err error) {
-	thread := model.Thread{}
+	thread := Thread{}
 	err = MySQL().Model(&thread).Where("id = ?", ID).Update("updated_at", time.Now()).Error
 	return
 }
 
-func  ReadUserFollowedThreadID(ID int32) (pairs []model.UserThread, err error) {
-	err = MySQL().Model(&model.UserThread{}).Select("thread_id").Where("user_id = ?", ID).Find(&pairs).Error
+func  ReadUserFollowedThreadID(ID int32) (pairs []UserThread, err error) {
+	err = MySQL().Model(&UserThread{}).Select("thread_id").Where("user_id = ?", ID).Find(&pairs).Error
 	return
 }
 
-func ReadUserFollowedThreads(ID int32) (threads []model.Thread, err error) {
+func ReadUserFollowedThreads(ID int32) (threads []Thread, err error) {
 	pairList, err := ReadUserFollowedThreadID(ID)
 	if err != nil {
 		return
@@ -220,28 +219,28 @@ func ReadUserFollowedThreads(ID int32) (threads []model.Thread, err error) {
 
 // posts
 func CountByThreadID(ID int32) (count int64, err error) {
-	err = MySQL().Model(&model.Post{}).Where("thread_id = ?", ID).Count(&count).Error
+	err = MySQL().Model(&Post{}).Where("thread_id = ?", ID).Count(&count).Error
 	return
 }
 
-func ReadPostsByThreadID(ID int32) (posts []model.Post, err error) {
+func ReadPostsByThreadID(ID int32) (posts []Post, err error) {
 	err = MySQL().Where("thread_id = ?", ID).Find(&posts).Error
 	return
 }
 
-func CreatePost(post *model.Post) (err error) {
+func CreatePost(post *Post) (err error) {
 	err = MySQL().Create(&post).Error
 	return
 }
 
-func ReadFirstPostByThreadID(ID int32) (post model.Post, err error) {
+func ReadFirstPostByThreadID(ID int32) (post Post, err error) {
 	err = MySQL().Where("thread_id = ?", ID).First(&post).Error
 	return
 }
 
 // thread->user
 func  CreateThreadUserPair(ThreadID, UserID, UserNum int32) (err error) {
-	threadUser := model.ThreadUser{
+	threadUser := ThreadUser{
 		ThreadID: ThreadID,
 		UserID:   UserID,
 		UserNum:  UserNum,
@@ -251,7 +250,7 @@ func  CreateThreadUserPair(ThreadID, UserID, UserNum int32) (err error) {
 }
 
 func  QueryThreadUserPair(ThreadID, UserID int32) (index int32, err error) {
-	tu := model.ThreadUser{}
+	tu := ThreadUser{}
 	err = MySQL().Where("thread_id = ? AND user_id = ?", ThreadID, UserID).First(&tu).Error
 	index = tu.UserNum
 	return
@@ -259,7 +258,7 @@ func  QueryThreadUserPair(ThreadID, UserID int32) (index int32, err error) {
 
 // user->thread
 func  CreateUserThreadPair(UserID, ThreadID int32) (err error) {
-	pair := model.UserThread{
+	pair := UserThread{
 		UserID:   UserID,
 		ThreadID: ThreadID,
 	}
@@ -268,7 +267,7 @@ func  CreateUserThreadPair(UserID, ThreadID int32) (err error) {
 }
 
 func  QueryUserThreadPair(UserID, ThreadID int32) (err error) {
-	pair := model.UserThread{}
+	pair := UserThread{}
 	err = MySQL().Where("user_id = ? AND thread_id = ?", UserID, ThreadID).Find(&pair).Error
 	return
 }

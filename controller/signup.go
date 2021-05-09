@@ -2,7 +2,6 @@ package controller
 
 import (
 	"GoProject/fudan_bbs/dal"
-	"GoProject/fudan_bbs/internal/model"
 	"GoProject/fudan_bbs/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,7 +13,7 @@ func signUp(c *gin.Context) {
 }
 
 func signUpAction(c *gin.Context) {
-	u := model.User{
+	u := dal.User{
 		EmailHash: utils.MD5WithSalt(c.PostForm("email")),
 		Password:  c.PostForm("password"),
 	}
